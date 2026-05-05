@@ -1,0 +1,14 @@
+{
+  "name": "task-management-system",
+  "version": "1.0.0",
+  "description": "Task Management System with AI Integration",
+  "main": "backend/index.js",
+  "scripts": {
+    "start": "node backend/index.js",
+    "install-all": "cd backend && npm install",
+    "build": "echo 'No build step required'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

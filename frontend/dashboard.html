@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskFlow — Dashboard</title>
+    <meta name="description" content="Your project and task management dashboard." />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        TaskFlow
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-user">
+            <div id="navAvatar" class="avatar"></div>
+            <div>
+                <div class="navbar-user-name" id="navName"></div>
+                <div class="navbar-user-role" id="navRole"></div>
+            </div>
+        </div>
+        <button id="logoutBtn" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<!-- Main -->
+<div class="page-wrapper container">
+    <div class="page-header flex justify-between items-center">
+        <div class="animate-in">
+            <h1>Dashboard</h1>
+            <p id="greetMsg">Welcome back! Here's your overview.</p>
+        </div>
+        <div id="adminActions" class="hidden animate-in delay-1">
+            <button class="btn btn-primary" onclick="utils.openModal('createProjectModal')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Project
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card stat-total animate-in delay-1"><div class="stat-label">Total Tasks</div><div class="stat-value" id="statTotal">—</div></div>
+        <div class="stat-card stat-progress animate-in delay-2"><div class="stat-label">In Progress</div><div class="stat-value" id="statProgress">—</div></div>
+        <div class="stat-card stat-done animate-in delay-3"><div class="stat-label">Completed</div><div class="stat-value" id="statDone">—</div></div>
+        <div class="stat-card stat-overdue animate-in delay-4"><div class="stat-label">Overdue</div><div class="stat-value" id="statOverdue">—</div></div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+        <!-- Recent Tasks -->
+        <div class="card animate-in delay-2">
+            <div class="card-header">
+                <div class="card-title">Recent Tasks</div>
+            </div>
+            <div class="table-wrap" id="recentTasksWrap">
+                <div class="page-loading"><div class="spinner"></div></div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div style="display:flex;flex-direction:column;gap:24px;">
+            <!-- Chart -->
+            <div class="card animate-in delay-3">
+                <div class="card-header"><div class="card-title">Task Status</div></div>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            <!-- Projects -->
+            <div class="card animate-in delay-4">
+                <div class="card-header">
+                    <div class="card-title">My Projects</div>
+                    <span id="projectCount" class="badge badge-admin">0</span>
+                </div>
+                <div class="project-list" id="projectList">
+                    <div class="page-loading"><div class="spinner"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Project Modal -->
+<div class="modal-overlay" id="createProjectModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Create New Project</h2>
+            <button class="modal-close" onclick="utils.closeModal('createProjectModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="createProjectError" class="auth-error hidden"></div>
+            <div class="form-group">
+                <label class="form-label">Project Title *</label>
+                <input id="projTitle" type="text" class="form-input" placeholder="My Awesome Project" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="projDesc" class="form-textarea" placeholder="What is this project about?"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Deadline</label>
+                <input id="projDeadline" type="date" class="form-input" />
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="utils.closeModal('createProjectModal')">Cancel</button>
+            <button class="btn btn-primary" id="createProjBtn" onclick="createProject()">Create Project</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container"></div>
+
+<script src="js/api.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

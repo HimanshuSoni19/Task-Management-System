@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskFlow — Project</title>
+    <meta name="description" content="View and manage tasks for your project." />
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        <a href="dashboard.html" style="display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        TaskFlow
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-user">
+            <div id="navAvatar" class="avatar"></div>
+            <div>
+                <div class="navbar-user-name" id="navName"></div>
+                <div class="navbar-user-role" id="navRole"></div>
+            </div>
+        </div>
+        <button id="logoutBtn" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<!-- Main -->
+<div class="page-wrapper container">
+
+    <!-- Project Header -->
+    <div class="project-header-card animate-in" id="projectHeader">
+        <div class="page-loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start;" id="mainLayout">
+
+        <!-- Kanban Board -->
+        <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <h2 style="font-size:1.1rem;font-weight:700;">Task Board</h2>
+                <div id="createTaskBtnWrap" class="hidden">
+                    <button class="btn btn-primary btn-sm" onclick="utils.openModal('createTaskModal')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Task
+                    </button>
+                </div>
+            </div>
+
+            <div class="kanban-board">
+                <div class="kanban-column col-todo">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">To Do</span>
+                        <span class="kanban-column-count" id="countTodo">0</span>
+                    </div>
+                    <div class="kanban-cards" id="colTodo"></div>
+                </div>
+                <div class="kanban-column col-progress">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">In Progress</span>
+                        <span class="kanban-column-count" id="countProgress">0</span>
+                    </div>
+                    <div class="kanban-cards" id="colProgress"></div>
+                </div>
+                <div class="kanban-column col-done">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">Done</span>
+                        <span class="kanban-column-count" id="countDone">0</span>
+                    </div>
+                    <div class="kanban-cards" id="colDone"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Panel -->
+        <div>
+            <div class="members-panel animate-in delay-2" id="membersPanel">
+                <div class="card-header">
+                    <div class="card-title">Team Members</div>
+                    <div id="addMemberBtnWrap" class="hidden">
+                        <button class="btn-icon" onclick="utils.openModal('addMemberModal')" title="Add Member">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="membersList"><div class="page-loading"><div class="spinner"></div></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal-overlay" id="createTaskModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Create Task</h2>
+            <button class="modal-close" onclick="utils.closeModal('createTaskModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="createTaskError" class="auth-error hidden"></div>
+            <div class="form-group">
+                <label class="form-label">Task Title *</label>
+                <input id="taskTitle" type="text" class="form-input" placeholder="Fix login bug…" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="taskDesc" class="form-textarea" placeholder="Details about this task…"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select id="taskPriority" class="form-select">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due Date</label>
+                    <input id="taskDueDate" type="date" class="form-input" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Assignee</label>
+                <select id="taskAssignee" class="form-select"><option value="">Unassigned</option></select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="utils.closeModal('createTaskModal')">Cancel</button>
+            <button class="btn btn-primary" id="createTaskBtn" onclick="createTask()">Create Task</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal-overlay" id="editTaskModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Edit Task</h2>
+            <button class="modal-close" onclick="utils.closeModal('editTaskModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="editTaskError" class="auth-error hidden"></div>
+            <input type="hidden" id="editTaskId" />
+            <div class="form-group">
+                <label class="form-label">Task Title *</label>
+                <input id="editTaskTitle" type="text" class="form-input" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="editTaskDesc" class="form-textarea"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="editTaskStatus" class="form-select">
+                        <option value="todo">To Do</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select id="editTaskPriority" class="form-select">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due Date</label>
+                    <input id="editTaskDueDate" type="date" class="form-input" />
+                </div>
+            </div>
+            <div class="form-group" id="editAssigneeWrap">
+                <label class="form-label">Assignee</label>
+                <select id="editTaskAssignee" class="form-select"><option value="">Unassigned</option></select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger btn-sm" id="deleteTaskBtn" onclick="deleteTask()">Delete</button>
+            <button class="btn btn-secondary" onclick="utils.closeModal('editTaskModal')">Cancel</button>
+            <button class="btn btn-primary" id="saveTaskBtn" onclick="saveTask()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal-overlay" id="addMemberModal">
+    <div class="modal" style="max-width:380px">
+        <div class="modal-header">
+            <h2>Add Member</h2>
+            <button class="modal-close" onclick="utils.closeModal('addMemberModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="addMemberError" class="auth-error hidden"></div>
+            <div class="form-group">
+                <label class="form-label">Member Email *</label>
+                <input id="memberEmail" type="email" class="form-input" placeholder="colleague@example.com" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Role</label>
+                <select id="memberRole" class="form-select">
+                    <option value="member">Member</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="utils.closeModal('addMemberModal')">Cancel</button>
+            <button class="btn btn-primary" id="addMemberBtn" onclick="addMember()">Add Member</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Project Modal -->
+<div class="modal-overlay" id="editProjectModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Edit Project</h2>
+            <button class="modal-close" onclick="utils.closeModal('editProjectModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="editProjectError" class="auth-error hidden"></div>
+            <div class="form-group">
+                <label class="form-label">Title *</label>
+                <input id="editProjTitle" type="text" class="form-input" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="editProjDesc" class="form-textarea"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="editProjStatus" class="form-select">
+                        <option value="active">Active</option>
+                        <option value="on-hold">On Hold</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deadline</label>
+                    <input id="editProjDeadline" type="date" class="form-input" />
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="utils.closeModal('editProjectModal')">Cancel</button>
+            <button class="btn btn-primary" id="saveProjectBtn" onclick="saveProject()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container"></div>
+
+<script src="js/api.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/project.js"></script>
+</body>
+</html>
